@@ -1,0 +1,31 @@
+name: "My Project Workflow"
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      chosen-os:
+        description: "Operating system to run the workflow on"
+        required: true
+        type: choice
+        options:
+          - Ubuntu
+
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sample-deploy:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["${{ inputs.chosen-os }}"]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.x
+    - run: terraform init
+    - run: terraform plan
+    - run: terraform apply -auto-approve
